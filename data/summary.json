@@ -1,0 +1,29 @@
+{
+  "test_mean_auc": 0.8182,
+  "paper_mean_auc": 0.843,
+  "gap": -0.0248,
+  "best_val_auc": 0.8125,
+  "best_epoch": 10,
+  "epochs_run": 18,
+  "backbone": "tf_efficientnet_b1.ns_jft_in1k",
+  "img_size": 240,
+  "split_seed": 97,
+  "per_label_test_auc": {
+    "Atelectasis": 0.7936,
+    "Cardiomegaly": 0.8928,
+    "Effusion": 0.8789,
+    "Infiltration": 0.6976,
+    "Mass": 0.8165,
+    "Nodule": 0.7554,
+    "Pneumonia": 0.7431,
+    "Pneumothorax": 0.8787,
+    "Consolidation": 0.7789,
+    "Edema": 0.9011,
+    "Emphysema": 0.9001,
+    "Fibrosis": 0.7915,
+    "Pleural_Thickening": 0.7784,
+    "Hernia": 0.8477
+  },
+  "macro_auprc": 0.2256,
+  "macro_f1": 0.2112
+}

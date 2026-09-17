@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Live Demo — ChestX-ray14 Replication{% endblock %}
+{% block footer_width %}wide{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>Try it</h1>
+    <p>Upload a frontal chest X-ray (PNG or JPEG) and the model will estimate the probability of each of 14 findings.
+    </p>
+  </div>
+</div>
+
+<div class="accent-line wide">
+  <div class="accent-line-bar" style="width: 60%;"></div>
+</div>
+
+<div class="page wide">
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  {% if not model_ready %}
+  <div class="empty-state">
+    <p><strong>The model isn't loaded on this server yet.</strong></p>
+    <p>Two things it needs:</p>
+    <p>1. The ML dependencies: <code>pip install -r requirements-model.txt</code></p>
+    <p>2. Your trained checkpoint, saved at <code>model/chestxray_b1_portable.pt</code></p>
+    {% if model_error %}
+    <p style="margin-top:16px; font-size:0.82rem; opacity:0.75;">Detail: {{ model_error }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <form class="demo-grid" method="POST" enctype="multipart/form-data" id="demo-form">
+    <div>
+      {% if image_url %}
+      <img src="{{ image_url }}" alt="Your uploaded X-ray"
+        style="max-width:100%; border-radius:6px; margin-bottom:16px; display:block;">
+      {% endif %}
+
+      {% if prediction %}
+      <a class="btn btn-primary" href="{{ url_for('demo') }}">Upload another image</a>
+      {% else %}
+      <label class="upload-label" for="xray-input" id="dropzone-label">
+        Click to choose an X-ray image<br><span style="font-size:0.85rem;">PNG or JPEG, up to 8&nbsp;MB</span>
+        <input type="file" name="xray" id="xray-input" accept=".png,.jpg,.jpeg">
+      </label>
+      <img id="preview" alt="Selected X-ray preview">
+      <div class="hero-actions" style="justify-content:flex-start; margin-top:16px;">
+        <button class="btn btn-primary" type="submit" {% if not model_ready %}disabled{% endif %}>Run
+          prediction</button>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      {% if prediction %}
+      <h3>Predicted findings</h3>
+      <p style="margin-bottom:14px;">Sorted by probability. Highlighted rows are above that finding's calibrated
+        operating threshold.</p>
+      {% for row in prediction %}
+      <div class="finding-row {{ 'above' if row.above_threshold else '' }}">
+        <span>{{ row.label.replace('_', ' ') }}</span>
+        <span class="prob">{{ "%.1f%%"|format(row.prob * 100) }}</span>
+      </div>
+      {% endfor %}
+      {% elif image_url %}
+      <p>Processed — see the results once they load.</p>
+      {% else %}
+      <p style="color:var(--muted); margin:0;">Predictions will appear here after you upload an image.</p>
+      {% endif %}
+    </div>
+  </form>
+
+  <div class="callout" style="margin-top:32px;">
+    <p>
+      Not a diagnostic tool. This is a class project replicating a published
+      research model — thresholds are calibrated on the NIH ChestX-ray14
+      test set and won't transfer perfectly to images from a different
+      scanner or population. Treat every number here as an estimate to
+      explore, not a clinical result.
+    </p>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/demo.js') }}"></script>
+{% endblock %}

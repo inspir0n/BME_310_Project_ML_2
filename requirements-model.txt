@@ -1,0 +1,9 @@
+# Install these ONLY once you're ready to make the live demo actually work.
+# The rest of the site (Home, Results, Methodology) never needs them.
+#
+#   pip install -r requirements.txt -r requirements-model.txt
+
+torch>=2.6.0
+timm>=1.0.9
+opencv-python-headless>=4.10.0.84
+numpy>=1.26.4

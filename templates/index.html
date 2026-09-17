@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}ChestX-ray14 Replication — Overview{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">BME 310 · Machine Learning Project</div>
+    <h1>Detecting 14 chest conditions from a single X-ray</h1>
+    <p class="lede">
+      A from-scratch PyTorch replication of Kufel et&nbsp;al. (2023): an
+      EfficientNet-B1 model that reads a chest radiograph and estimates the
+      likelihood of 14 different findings at once.
+    </p>
+
+    <div class="hero-art">
+      <img src="{{ url_for('static', filename='img/ribcage.png') }}" alt="">
+    </div>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="value">0.818</div>
+        <div class="label">mean AUC across 14 findings, on unseen test images</div>
+      </div>
+      <div class="stat">
+        <div class="value">112,120</div>
+        <div class="label">chest X-rays trained and evaluated on</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{{ url_for('results') }}">See the full results</a>
+      <a class="btn btn-secondary" href="{{ url_for('demo') }}">Try the live demo</a>
+    </div>
+  </div>
+</section>
+
+<div class="accent-line">
+  <div class="accent-line-bar" style="width: 20%;"></div>
+</div>
+
+<section class="block page">
+
+  <div class="divider">
+    <span class="num">1.</span><h2 style="display:inline;">What this is</h2>
+    <p>The problem, the data, and what was actually built.</p>
+  </div>
+
+  <p>
+    The NIH ChestX-ray14 dataset contains 112,120 frontal chest radiographs
+    from 30,805 patients, each labelled for up to 14 pathologies by mining
+    the text of radiology reports. This project reproduces a 2023 paper's
+    approach to classifying them: an ImageNet-pretrained EfficientNet-B1
+    backbone, fine-tuned with a small classifier head, one independent
+    sigmoid output per disease.
+  </p>
+  <p>
+    It's a course project, built and debugged from the ground up — including
+    a genuine reproducibility bug found in a public pretrained checkpoint
+    along the way. The <a href="{{ url_for('methodology') }}">methodology page</a>
+    covers what deviates from the paper and why, and where the paper itself
+    turned out to have errors.
+  </p>
+
+  <div style="margin-top: 20px;">
+    <span class="pill">PyTorch</span>
+    <span class="pill">timm / EfficientNet-B1</span>
+    <span class="pill">Patient-wise split</span>
+    <span class="pill">Grad-CAM</span>
+    <span class="pill">Flask</span>
+  </div>
+
+  <div class="callout">
+    <p>
+      This model is a student replication project, not a medical device.
+      The live demo is for exploring how the model behaves — not for
+      diagnosis, and not validated for clinical use.
+    </p>
+  </div>
+
+</section>
+
+{% endblock %}

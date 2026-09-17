@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ChestX-ray14 Replication{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="{{ url_for('home') }}">ChestX-ray14 <span>Replication</span></a>
+      <details class="nav-menu">
+        <summary class="nav-toggle" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </summary>
+        <div class="nav-dropdown">
+          <a href="{{ url_for('home') }}" {% if request.path==url_for('home') %}class="active" {% endif %}>Overview</a>
+          <a href="{{ url_for('results') }}" {% if request.path==url_for('results') %}class="active" {% endif
+            %}>Results</a>
+          <a href="{{ url_for('demo') }}" {% if request.path==url_for('demo') %}class="active" {% endif %}>Live demo</a>
+          <a href="{{ url_for('methodology') }}" {% if request.path==url_for('methodology') %}class="active" {% endif
+            %}>Methodology</a>
+          <a href="{{ url_for('credits') }}" {% if request.path==url_for('credits') %}class="active" {% endif
+            %}>Credits</a>
+        </div>
+      </details>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <footer>
+    <div class="footer-inner {% block footer_width %}{% endblock %}">
+      <img class="footer-logo" src="{{ url_for('static', filename='img/buet-bme-logo.svg') }}"
+        alt="Bangladesh University of Engineering and Technology, Biomedical Engineering">
+    </div>
+  </footer>
+
+</body>
+
+</html>
