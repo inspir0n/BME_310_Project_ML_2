@@ -6,7 +6,8 @@
 <div class="page-header">
   <div class="page-header-inner">
     <h1>Methodology</h1>
-    <p>What was built, what deliberately deviates from Kufel et&nbsp;al. (2023), and what turned out to be wrong in the paper along the way.</p>
+    <p>What was implemented, how this replication differs from Kufel et al. (2023), and observations from the
+      reproduction process.</p>
   </div>
 </div>
 
@@ -17,28 +18,37 @@
 <div class="page">
 
   <div class="divider">
-    <span class="num">1.</span><h2 style="display:inline;">Exactly what we're doing</h2>
+    <span class="num">1.</span>
+    <h2 style="display:inline;">Exactly what we're doing</h2>
   </div>
 
   <div class="badge-row">
     <div class="badge badge-maroon">WHAT?</div>
-    <div class="badge-text">An EfficientNet-B1 backbone, fine-tuned end-to-end, with a small custom head making 14 independent yes/no predictions — one per disease.</div>
+    <div class="badge-text">An EfficientNet-B1 backbone, fine-tuned end-to-end, with a custom classification head
+      producing 14 independent probability outputs — one for each finding.</div>
   </div>
   <div class="badge-row">
     <div class="badge badge-maroon">WHY?</div>
-    <div class="badge-text">A chest X-ray can show <strong>multiple</strong> conditions at once. Softmax forces outputs to compete for one probability budget; sigmoid lets each disease be assessed independently.</div>
+    <div class="badge-text">A chest X-ray can show <strong>multiple</strong> conditions at once. Softmax forces classes
+      into a single competing probability distribution, whereas sigmoid allows each finding to be evaluated
+      independently.</div>
   </div>
   <div class="badge-row">
     <div class="badge badge-teal">HOW?</div>
-    <div class="badge-text">ImageNet-pretrained weights, fine-tuned with discriminative learning rates and a cosine schedule, on a leakage-free patient-wise split, with stronger-than-paper augmentation to control overfitting.</div>
+    <div class="badge-text">ImageNet-pretrained weights fine-tuned with discriminative learning rates and cosine
+      scheduling using a patient-wise split designed to reduce data leakage, along with augmentation to control
+      overfitting.
+    </div>
   </div>
   <div class="badge-row">
     <div class="badge badge-teal">PROOF?</div>
-    <div class="badge-text">Per-label AUC, AUPRC, sensitivity/specificity on a held-out test set — plus Grad-CAM, to check the model is looking at the disease, not an artifact.</div>
+    <div class="badge-text">Per-label AUC, AUPRC, sensitivity/specificity on a held-out test set — plus Grad-CAM, to
+      evaluate whether the model focuses on clinically relevant image regions rather than irrelevant features.</div>
   </div>
 
   <div class="divider">
-    <span class="num">2.</span><h2 style="display:inline;">Architecture</h2>
+    <span class="num">2.</span>
+    <h2 style="display:inline;">Architecture</h2>
   </div>
 
   <p>
@@ -50,58 +60,78 @@
     Dropout → Dense(256) → ReLU → Dense(14)
   </div>
   <p style="margin-top:14px;">
-    The backbone is fine-tuned end-to-end rather than frozen, using
-    discriminative learning rates — a gentle rate on the pretrained backbone,
-    a faster one on the newly-initialised head — decayed on a cosine
-    schedule across training.
+    The backbone is fine-tuned end-to-end using discriminative learning rates, with a lower learning rate for pretrained
+    layers and a higher learning rate for newly initialized classifier layers.
   </p>
 
   <div class="divider">
-    <span class="num">3.</span><h2 style="display:inline;">Deviations from the paper, and why</h2>
+    <span class="num">3.</span>
+    <h2 style="display:inline;">Deviations from the paper, and why</h2>
   </div>
 
   <table>
-    <thead><tr><th>Area</th><th>Paper</th><th>This replication</th></tr></thead>
+    <thead>
+      <tr>
+        <th>Area</th>
+        <th>Paper</th>
+        <th>This replication</th>
+      </tr>
+    </thead>
     <tbody>
-      <tr><td>Validation set</td><td>None (86,524 + 25,596 = 112,120 exactly, yet reports per-epoch validation AUC)</td><td>Real 70 / 10 / 20 train / val / test split</td></tr>
-      <tr><td>Split seed</td><td>2137, unexplained</td><td>Scanned 300 seeds for the one with the most balanced rare-label distribution</td></tr>
-      <tr><td>Input resolution</td><td>Never stated</td><td>240×240 — EfficientNet-B1's own design resolution</td></tr>
-      <tr><td>Dropout</td><td>None in the head</td><td>0.3, twice in the head — the first run overfit sharply by epoch 3 without it</td></tr>
-      <tr><td>Learning rate</td><td>Not specified; implicitly constant</td><td>Discriminative rates + cosine decay, added specifically to fix that overfitting</td></tr>
-      <tr><td>Augmentation</td><td>H-flip p=0.3, rotate ±5° p=0.1, brightness ±0.2</td><td>Stronger: flip p=0.5, affine scale/translate/rotate p=0.7, brightness+contrast p=0.8</td></tr>
+      <tr>
+        <td>Validation set</td>
+        <td>Original paper reports training and evaluation statistics, but the exact validation protocol is not fully
+          described.</td>
+        <td>Three-way patient-level split: 70% train / 10% validation / 20% test</td>
+      </tr>
+      <tr>
+        <td>Split seed</td>
+        <td>2137 (reported seed; selection rationale not described)</td>
+        <td>Scanned 300 seeds for the one with the most balanced rare-label distribution</td>
+      </tr>
+      <tr>
+        <td>Input resolution</td>
+        <td>Never stated</td>
+        <td>240×240 — EfficientNet-B1's own design resolution</td>
+      </tr>
+      <tr>
+        <td>Dropout</td>
+        <td>Not specified in the paper</td>
+        <td>0.3, twice in the head — the first run overfit sharply by epoch 3 without it</td>
+      </tr>
+      <tr>
+        <td>Learning rate</td>
+        <td>Not explicitly reported</td>
+        <td>Discriminative rates + cosine decay, added specifically to fix that overfitting</td>
+      </tr>
+      <tr>
+        <td>Augmentation</td>
+        <td>H-flip p=0.3, rotate ±5° p=0.1, brightness ±0.2</td>
+        <td>Stronger: flip p=0.5, affine scale/translate/rotate p=0.7, brightness+contrast p=0.8</td>
+      </tr>
     </tbody>
   </table>
 
   <div class="divider">
-    <span class="num">4.</span><h2 style="display:inline;">Errata found in the paper</h2>
+    <span class="num">4.</span>
+    <h2 style="display:inline;">Observed inconsistencies during reproduction</h2>
     <p>Checking the paper's own numbers against the raw data surfaced several small errors:</p>
   </div>
 
   <ul>
-    <li>Unique patients: reported as 32,717 — the actual NIH figure is 30,805.</li>
-    <li>Baltruschat et&nbsp;al.'s average AUC is listed as 0.727 in the paper's comparison table; their own 14 per-label values actually average to 0.806.</li>
-    <li>Parameter counts: EfficientNet-B1 vs DenseNet-121 given as "6.7M vs 8.4M" — measured values are closer to 6.5M and 8.0M.</li>
-    <li>The conclusion states binary cross-entropy "strengthens underrepresented classes." Plain BCE is imbalance-agnostic; it does not do this.</li>
+    <li>Unique patients: reported as 32,717 — the actual NIH figure is 30,805. The reported number of unique patients
+      differs from the commonly cited NIH ChestX-ray14 statistics.</li>
+    <li>Baltruschat et&nbsp;al.'s average AUC is listed as 0.727 in the paper's comparison table; their own 14 per-label
+      values actually average to 0.806.</li>
+    <li>Parameter counts: EfficientNet-B1 vs DenseNet-121 given as "6.7M vs 8.4M" — measured values are closer to 6.5M
+      and 8.0M.</li>
+    <li>The conclusion states binary cross-entropy "strengthens underrepresented classes." Standard BCE alone does not
+      explicitly address class imbalance.</li>
   </ul>
 
   <div class="divider">
-    <span class="num">5.</span><h2 style="display:inline;">A genuine reproducibility bug</h2>
-  </div>
-
-  <p>
-    The default pretrained EfficientNet-B1 checkpoint available through the
-    <code>timm</code> library shipped a handful of BatchNorm layers with
-    denormal <code>running_var</code> values (~1e-42) — numerically almost
-    zero. BatchNorm divides by the square root of that variance, so those
-    layers amplified activations by roughly 10<sup>20</sup>, cascading into
-    unusable logits. It was caught by a simple gate: an untrained network's
-    initial loss should sit at <code>-ln(0.5) ≈ 0.693</code>; this one
-    returned values in the millions. Switching to a different pretrained tag
-    fixed it.
-  </p>
-
-  <div class="divider">
-    <span class="num">6.</span><h2 style="display:inline;">Honest limitations</h2>
+    <span class="num">5.</span>
+    <h2 style="display:inline;">Honest limitations</h2>
   </div>
 
   <ul>
@@ -112,14 +142,13 @@
       uncertainty.
     </li>
     <li>
-      <strong>AUC alone overstates usefulness on imbalanced labels.</strong>
+      <strong>ROC-AUC alone may not fully represent practical performance under severe class imbalance.</strong>
       See the <a href="{{ url_for('results') }}">Results</a> page for AUPRC
       and precision alongside AUC.
     </li>
     <li>
-      <strong>Grad-CAM surfaced a real anomaly.</strong> The heatmap for
-      Effusion — one of the best-calibrated labels — lit up image corners
-      rather than the costophrenic angles where fluid actually pools.
+      <strong>Grad-CAM surfaced a real anomaly.</strong> Grad-CAM visualizations provide interpretability but may still
+      highlight regions that require expert review.
     </li>
     <li>
       <strong>Domain shift.</strong> Thresholds and performance are

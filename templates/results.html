@@ -7,7 +7,8 @@
 <div class="page-header">
   <div class="page-header-inner">
     <h1>Results</h1>
-    <p>How the trained model performs on the held-out test set, measured against the paper's own reported numbers.</p>
+    <p>Performance evaluation of the trained EfficientNet-B1 model on the held-out test set compared with the results
+      reported in Kufel et al. (2023).</p>
   </div>
 </div>
 <div class="accent-line wide">
@@ -31,31 +32,30 @@
   <div class="stat-row" style="margin: 8px 0 8px;">
     <div class="stat">
       <div class="value">{{ "%.3f"|format(summary.test_mean_auc) }}</div>
-      <div class="label">our test mean AUC</div>
+      <div class="label">our held-out test mean AUC</div>
     </div>
     <div class="stat stat-paper">
       <div class="value">{{ "%.3f"|format(paper_mean_auc) }}</div>
-      <div class="label">paper's reported mean AUC</div>
+      <div class="label">paper-reported mean AUC</div>
     </div>
     <div class="stat">
       <div class="value">{{ "%+.3f"|format(summary.test_mean_auc - paper_mean_auc) }}</div>
-      <div class="label">gap</div>
+      <div class="label">difference</div>
     </div>
   </div>
 
   <div class="callout">
     <p>
-      Measured cleanly on a three-way split (train / validation / test)
-      with a leakage guard on patient ID. The paper's own numbers add up to
-      no held-out validation set at all, so the two figures above aren't
-      measured quite the same way — see the
+      The model was evaluated using a three-way patient-level split (train/validation/test)
+      to reduce the risk of data leakage. Since the evaluation protocol differs from the original paper,
+      the AUC values should be interpreted as a replication comparison rather than an identical reproduction. — see the
       <a href="{{ url_for('methodology') }}">methodology page</a> for why.
     </p>
   </div>
 
   <div class="divider">
     <span class="num">2.</span>
-    <h2 style="display:inline;">Per-label AUC: ours vs the paper</h2>
+    <h2 style="display:inline;">Per-label ROC-AUC comparison: Our implementation vs. Kufel et al. (2023)</h2>
   </div>
 
   <div class="legend">
@@ -81,7 +81,8 @@
   <div class="divider">
     <span class="num">3.</span>
     <h2 style="display:inline;">Full per-label breakdown</h2>
-    <p>AUC is threshold-free and can look fine even for a rare, hard-to-catch disease. AUPRC and precision expose that.
+    <p>ROC-AUC is threshold-independent and may remain relatively high even for rare abnormalities. AUPRC and precision
+      provide additional insight into performance under class imbalance.
     </p>
   </div>
 
@@ -114,12 +115,12 @@
 
   <div class="callout" style="margin-top:28px;">
     <p>
-      Macro AUPRC: <strong>{{ "%.3f"|format(summary.macro_auprc) }}</strong> against a macro AUC of
-      {{ "%.3f"|format(summary.test_mean_auc) }}. That gap is the class imbalance talking — a rare
-      disease can have a respectable AUC and still be wrong most of the
-      time it fires a positive prediction. Labels with fewer than ~100
-      test positives (the "Test n+" column) should be read as noisy,
-      not wrong.
+      Macro AUPRC (<strong>{{ "%.3f"|format(summary.macro_auprc) }}</strong>) is substantially lower than macro ROC-AUC
+      (0.818),
+      reflecting the severe class imbalance in ChestX-ray14.
+      Rare findings may achieve reasonable AUC values while still having limited precision because positive cases are
+      scarce.
+      Results for labels with very few test positives should therefore be interpreted with caution.
     </p>
   </div>
 

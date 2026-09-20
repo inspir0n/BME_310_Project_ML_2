@@ -7,7 +7,8 @@
 <div class="page-header">
   <div class="page-header-inner">
     <h1>Try it</h1>
-    <p>Upload a frontal chest X-ray (PNG or JPEG) and the model will estimate the probability of each of 14 findings.
+    <p>Upload a frontal chest X-ray (PNG or JPEG), and the model will estimate the likelihood of 14 thoracic findings
+      using a trained EfficientNet-B1 model.
     </p>
   </div>
 </div>
@@ -72,18 +73,17 @@
       {% elif image_url %}
       <p>Processed — see the results once they load.</p>
       {% else %}
-      <p style="color:var(--muted); margin:0;">Predictions will appear here after you upload an image.</p>
+      <p style="color:var(--muted); margin:0;">Model predictions will appear here after image processing.</p>
       {% endif %}
     </div>
   </form>
 
   <div class="callout" style="margin-top:32px;">
     <p>
-      Not a diagnostic tool. This is a class project replicating a published
-      research model — thresholds are calibrated on the NIH ChestX-ray14
-      test set and won't transfer perfectly to images from a different
-      scanner or population. Treat every number here as an estimate to
-      explore, not a clinical result.
+      This is a student replication project of a published research model and is not intended for clinical diagnosis.
+      The decision thresholds are calibrated using the NIH ChestX-ray14 dataset and may not generalize perfectly to
+      images from different scanners or populations.
+      The displayed values represent model estimates for exploration, not clinical decisions.
     </p>
   </div>
 </div>

@@ -8,9 +8,9 @@
     <div class="hero-eyebrow">BME 310 · Machine Learning Project</div>
     <h1>Detecting 14 chest conditions from a single X-ray</h1>
     <p class="lede">
-      A from-scratch PyTorch replication of Kufel et&nbsp;al. (2023): an
-      EfficientNet-B1 model that reads a chest radiograph and estimates the
-      likelihood of 14 different findings at once.
+      A PyTorch-based replication of Kufel et al. (2023),
+      implementing a pretrained EfficientNet-B1 model to analyze chest radiographs
+      and estimate the likelihood of 14 thoracic abnormalities simultaneously.
     </p>
 
     <div class="hero-art">
@@ -42,39 +42,41 @@
 <section class="block page">
 
   <div class="divider">
-    <span class="num">1.</span><h2 style="display:inline;">What this is</h2>
+    <span class="num">1.</span>
+    <h2 style="display:inline;">What this is</h2>
     <p>The problem, the data, and what was actually built.</p>
   </div>
 
   <p>
-    The NIH ChestX-ray14 dataset contains 112,120 frontal chest radiographs
-    from 30,805 patients, each labelled for up to 14 pathologies by mining
-    the text of radiology reports. This project reproduces a 2023 paper's
-    approach to classifying them: an ImageNet-pretrained EfficientNet-B1
-    backbone, fine-tuned with a small classifier head, one independent
-    sigmoid output per disease.
+    The NIH ChestX-ray14 dataset contains 112,120 frontal chest radiographs from 30,805 patients,
+    with each image labelled for up to 14 thoracic findings derived from radiology reports.
+    This project reproduces a 2023 paper's multi-label classification approach:
+    an ImageNet-pretrained EfficientNet-B1 backbone fine-tuned with a lightweight classifier head,
+    producing one independent sigmoid output for each finding.
   </p>
   <p>
-    It's a course project, built and debugged from the ground up — including
-    a genuine reproducibility bug found in a public pretrained checkpoint
-    along the way. The <a href="{{ url_for('methodology') }}">methodology page</a>
-    covers what deviates from the paper and why, and where the paper itself
-    turned out to have errors.
+    This is a course project developed to reproduce and evaluate the paper's methodology,
+    including analysis of implementation differences and model performance. The <a
+      href="{{ url_for('methodology') }}">methodology page</a>
+    covers what deviates from the paper and why,
+    and discusses the differences between the original methodology and this implementation.
   </p>
 
   <div style="margin-top: 20px;">
     <span class="pill">PyTorch</span>
-    <span class="pill">timm / EfficientNet-B1</span>
+    <span class="pill">EfficientNet-B1</span>
     <span class="pill">Patient-wise split</span>
     <span class="pill">Grad-CAM</span>
+    <span class="pill">Transfer Learning</span>
+    <span class="pill">Multi-label Classification</span>
     <span class="pill">Flask</span>
   </div>
 
   <div class="callout">
     <p>
-      This model is a student replication project, not a medical device.
-      The live demo is for exploring how the model behaves — not for
-      diagnosis, and not validated for clinical use.
+      This model is a student replication project and is not intended as a medical device.
+      The live demo is designed to explore model behavior and predictions,
+      not to provide diagnosis or clinical decisions.
     </p>
   </div>
 
