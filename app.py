@@ -24,10 +24,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 
 
 
-# ---------------------------------------------------------------------------
-# Paths — computed once, relative to this file, so the app works no matter
-# what folder you launch it from.
-# ---------------------------------------------------------------------------
+
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 UPLOAD_DIR = BASE_DIR / "uploads"
@@ -42,11 +39,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-this-before-deploying")  # needed for flash messages
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # reject uploads over 8 MB
 
-# ---------------------------------------------------------------------------
-# The paper's reported per-label AUC (Kufel et al. 2023), used everywhere we
-# compare "ours vs the paper". Order matches the paper's Table 1 — keep it
-# fixed, since output neuron i always means PATHOLOGIES[i].
-# ---------------------------------------------------------------------------
+
 PATHOLOGIES = [
     "Atelectasis", "Cardiomegaly", "Effusion", "Infiltration",
     "Mass", "Nodule", "Pneumonia", "Pneumothorax",
@@ -62,16 +55,8 @@ PAPER_AUC = {
 }
 PAPER_MEAN_AUC = 0.843
 
-# ---------------------------------------------------------------------------
-# Try to load the trained model ONCE at startup, not on every request — an
-# EfficientNet takes a moment to build and we don't want visitors waiting on
-# that for every prediction.
-#
-# This is wrapped in try/except on purpose: you may not have dropped the
-# trained weights file in yet, or torch/timm may not be installed yet. The
-# rest of the site should still work fine without the demo being live —
-# the demo page will just explain what's missing instead of crashing.
-# ---------------------------------------------------------------------------
+
+
 MODEL, MODEL_META, MODEL_ERROR = None, None, None
 try:
     from model.chestxray_model import load_model  # noqa: E402
@@ -104,8 +89,6 @@ def _normalize_per_label(rows):
     return rows
 
 
-# Re-parsing a multi-MB .ipynb on every page view would be wasteful, so this
-# only redoes the work when the file's own last-modified time has changed.
 _notebook_cache = {"mtime": None, "summary": None, "per_label": None}
 
 
@@ -178,9 +161,7 @@ def get_thresholds():
     }
 
 
-# ---------------------------------------------------------------------------
-# Routes
-# ---------------------------------------------------------------------------
+
 @app.route("/")
 def home():
     return render_template("index.html", model_ready=MODEL is not None)
@@ -250,17 +231,11 @@ def demo():
             for label, prob in sorted(raw.items(), key=lambda kv: -kv[1])
         ]
 
-        # Stash the result and redirect to a plain GET, rather than
-        # rendering the template directly here. This means the browser's
-        # history entry for this page is a harmless GET, not the form
-        # submission itself — refresh after this and you get a fresh GET
-        # back, not a resubmitted upload with stale results.
+      
         session["last_result"] = {"filename": file.filename, "prediction": prediction}
         return redirect(url_for("demo"))
 
-    # GET: show the most recent result exactly once, then forget it. This is
-    # what makes a refresh reset to a clean form instead of showing old
-    # results forever, or results without the image that produced them.
+    
     result = session.pop("last_result", None)
     prediction = result["prediction"] if result else None
     image_url = url_for("uploaded_file", filename=result["filename"]) if result else None
